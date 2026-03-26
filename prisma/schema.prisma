@@ -1,0 +1,400 @@
+// prisma/schema.prisma
+// PMApp — JIRA-like Project Management Application
+// Full schema with all models, enums, relations, indexes
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// =====================================================================
+// ENUMS
+// =====================================================================
+
+enum Role {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  REVOKED
+}
+
+enum StatusCategory {
+  BACKLOG
+  TODO
+  IN_PROGRESS
+  DONE
+  CANCELLED
+}
+
+enum IssueType {
+  EPIC
+  STORY
+  TASK
+  BUG
+}
+
+enum Priority {
+  URGENT // P0
+  HIGH   // P1
+  MEDIUM // P2
+  LOW    // P3
+  NONE   // P4
+}
+
+enum LinkType {
+  BLOCKS
+  IS_BLOCKED_BY
+  RELATES_TO
+  DUPLICATES
+  IS_DUPLICATED_BY
+}
+
+enum SprintStatus {
+  PLANNED
+  ACTIVE
+  COMPLETED
+}
+
+// =====================================================================
+// AUTHENTICATION (NextAuth.js / Auth.js v5)
+// =====================================================================
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String? // Hashed via bcryptjs (null for OAuth-only users)
+
+  // NextAuth relations
+  accounts Account[]
+  sessions Session[]
+
+  // PM app relations
+  workspaces      WorkspaceMember[]
+  ownedWorkspaces Workspace[]       @relation("WorkspaceOwner")
+  assignedIssues  Issue[]           @relation("Assignee")
+  reportedIssues  Issue[]           @relation("Reporter")
+  comments        Comment[]
+  activities      Activity[]        @relation("ActivityActor")
+  starredProjects ProjectFavorite[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// =====================================================================
+// WORKSPACE (Multi-tenant boundary)
+// =====================================================================
+
+model Workspace {
+  id          String  @id @default(cuid())
+  name        String
+  slug        String  @unique // URL-safe: /[slug]/projects
+  description String?
+  image       String?
+  ownerId     String
+  owner       User    @relation("WorkspaceOwner", fields: [ownerId], references: [id])
+
+  members     WorkspaceMember[]
+  projects    Project[]
+  invitations WorkspaceInvitation[]
+  labels      Label[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ownerId])
+}
+
+model WorkspaceMember {
+  userId      String
+  workspaceId String
+  role        Role   @default(MEMBER)
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  joinedAt DateTime @default(now())
+
+  @@id([userId, workspaceId])
+  @@index([workspaceId])
+}
+
+model WorkspaceInvitation {
+  id          String           @id @default(cuid())
+  email       String
+  workspaceId String
+  workspace   Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  role        Role             @default(MEMBER)
+  invitedById String
+  token       String           @unique @default(cuid())
+  status      InvitationStatus @default(PENDING)
+  expiresAt   DateTime
+
+  createdAt DateTime @default(now())
+
+  @@index([email, workspaceId])
+  @@index([token])
+}
+
+// =====================================================================
+// PROJECT
+// =====================================================================
+
+model Project {
+  id           String    @id @default(cuid())
+  name         String
+  prefix       String // Issue key prefix, e.g., "PROJ" -> "PROJ-1", "PROJ-2"
+  description  String?
+  icon         String? // Emoji icon, e.g., "🚀"
+  color        String? // Hex color, e.g., "#3B82F6"
+  workspaceId  String
+  workspace    Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  leadId       String? // Project lead (workspace member)
+  issueCounter Int       @default(0) // Atomic counter for issue key generation
+
+  issues    Issue[]
+  sprints   Sprint[]
+  statuses  WorkflowStatus[]
+  favorites ProjectFavorite[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? // Soft delete — filter with { deletedAt: null } in all queries
+
+  @@unique([workspaceId, prefix])
+  @@index([workspaceId])
+}
+
+model ProjectFavorite {
+  userId    String
+  projectId String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@id([userId, projectId])
+}
+
+// =====================================================================
+// WORKFLOW STATUS (Customizable per project)
+// =====================================================================
+
+model WorkflowStatus {
+  id        String         @id @default(cuid())
+  name      String // Display name: "In Review", "QA", etc.
+  category  StatusCategory // Logical grouping for board behavior
+  color     String         @default("#6B7280") // Hex color
+  position  Int // Sort order for board columns (0-based)
+  projectId String
+  project   Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  issues Issue[]
+
+  @@unique([projectId, name])
+  @@index([projectId, position])
+}
+
+// =====================================================================
+// ISSUE
+// =====================================================================
+
+model Issue {
+  id              String    @id @default(cuid())
+  key             String    @unique // Human-readable: "PROJ-123"
+  number          Int // Auto-increment per project (e.g., 123)
+  title           String    @db.VarChar(255)
+  description     Json? // Tiptap JSON content
+  descriptionText String? // Plain text extraction for search
+  type            IssueType @default(TASK)
+  priority        Priority  @default(MEDIUM)
+  position        String // Fractional index for ordering within column
+  dueDate         DateTime?
+  storyPoints     Int? // Phase 2: Fibonacci (1,2,3,5,8,13,21)
+
+  // Workflow
+  statusId String
+  status   WorkflowStatus @relation(fields: [statusId], references: [id])
+
+  // Ownership
+  projectId  String
+  project    Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  assigneeId String?
+  assignee   User?   @relation("Assignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  reporterId String
+  reporter   User    @relation("Reporter", fields: [reporterId], references: [id])
+
+  // Sprint (Phase 2 — schema ready now)
+  sprintId String?
+  sprint   Sprint? @relation(fields: [sprintId], references: [id], onDelete: SetNull)
+
+  // Hierarchy (Phase 2 — schema ready now)
+  parentId String?
+  parent   Issue?  @relation("IssueHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children Issue[] @relation("IssueHierarchy")
+
+  // Many-to-many
+  labels     Label[]
+  comments   Comment[]
+  activities Activity[]
+
+  // Issue links (Phase 2)
+  linksFrom IssueLink[] @relation("LinkFrom")
+  linksTo   IssueLink[] @relation("LinkTo")
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? // Soft delete — filter with { deletedAt: null } in all queries
+
+  // Critique revision: composite index on (projectId, number) for fast lookup
+  @@unique([projectId, number])
+  @@index([projectId, statusId, position])
+  @@index([projectId, assigneeId])
+  @@index([projectId, sprintId])
+  @@index([assigneeId])
+  @@index([parentId])
+}
+
+// =====================================================================
+// ISSUE LINKS (Phase 2 — schema now for forward compatibility)
+// =====================================================================
+
+model IssueLink {
+  id     String   @id @default(cuid())
+  type   LinkType
+  fromId String
+  from   Issue    @relation("LinkFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  toId   String
+  to     Issue    @relation("LinkTo", fields: [toId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([fromId, toId, type])
+}
+
+// =====================================================================
+// LABELS (Workspace-scoped, shared across projects)
+// =====================================================================
+
+model Label {
+  id          String    @id @default(cuid())
+  name        String
+  color       String    @default("#6B7280")
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  issues      Issue[]
+
+  @@unique([workspaceId, name])
+}
+
+// =====================================================================
+// SPRINT (Phase 2 — schema now for forward compatibility)
+// =====================================================================
+
+model Sprint {
+  id          String       @id @default(cuid())
+  name        String // "Sprint 14"
+  goal        String? // Sprint goal description
+  projectId   String
+  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  status      SprintStatus @default(PLANNED)
+  startDate   DateTime?
+  endDate     DateTime?
+  completedAt DateTime?
+
+  issues Issue[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId, status])
+}
+
+// =====================================================================
+// COMMENTS
+// =====================================================================
+
+model Comment {
+  id       String @id @default(cuid())
+  body     Json // Tiptap JSON content
+  bodyText String // Plain text extraction for search
+  issueId  String
+  issue    Issue  @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([issueId, createdAt])
+}
+
+// =====================================================================
+// ACTIVITY LOG (Append-only audit trail)
+// =====================================================================
+
+model Activity {
+  id        String  @id @default(cuid())
+  type      String // "ISSUE_CREATED", "STATUS_CHANGED", "ASSIGNED", etc.
+  issueId   String?
+  issue     Issue?  @relation(fields: [issueId], references: [id], onDelete: SetNull)
+  projectId String
+  actorId   String
+  actor     User    @relation("ActivityActor", fields: [actorId], references: [id])
+  metadata  Json // { field: "status", from: "TODO", to: "IN_PROGRESS" }
+
+  createdAt DateTime @default(now())
+
+  @@index([issueId, createdAt])
+  @@index([projectId, createdAt])
+  @@index([actorId])
+}

@@ -1,0 +1,33 @@
+# PMApp Environment Variables Template
+# Copy this file to .env and fill in the values
+#
+# cp env-template .env
+
+# ============================================
+# DATABASE
+# ============================================
+DATABASE_URL="postgresql://pmapp:pmapp_dev_password@localhost:5432/pmapp?schema=public"
+
+# ============================================
+# NEXTAUTH.JS
+# ============================================
+# Generate: openssl rand -base64 32
+NEXTAUTH_SECRET="your-secret-here"
+NEXTAUTH_URL="http://localhost:3000"
+
+# ============================================
+# OAUTH PROVIDERS
+# ============================================
+# Google (https://console.cloud.google.com/apis/credentials)
+GOOGLE_CLIENT_ID=""
+GOOGLE_CLIENT_SECRET=""
+
+# GitHub (https://github.com/settings/developers)
+GITHUB_CLIENT_ID=""
+GITHUB_CLIENT_SECRET=""
+
+# ============================================
+# APP CONFIG
+# ============================================
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
+NEXT_PUBLIC_APP_NAME="PMApp"

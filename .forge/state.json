@@ -1,0 +1,18 @@
+{
+  "feature": "Full project management app like JIRA — projects, boards, issues, sprints, teams, dashboards",
+  "project": "/home/vidit/projects/pmapp",
+  "current_phase": 7,
+  "current_phase_name": "REVIEW",
+  "phase_status": "in_progress",
+  "stack": "Next.js 15 + TypeScript + PostgreSQL + Prisma + Tailwind CSS + shadcn/ui + NextAuth.js",
+  "component_matrix": [
+    {"language": "TypeScript", "layer": "Frontend", "scope": "src/app/, src/components/, src/hooks/, src/lib/", "agent": "Builder-TS-Frontend"},
+    {"language": "TypeScript", "layer": "API", "scope": "src/app/api/, src/server/, src/lib/auth/", "agent": "Builder-TS-API"},
+    {"language": "SQL", "layer": "Database", "scope": "prisma/, src/lib/db/", "agent": "Builder-SQL-DB"}
+  ],
+  "phases_completed": [1, 2, 3, 4, 5, 6],
+  "approval_gates_passed": [3, 4],
+  "qa_round": 0,
+  "total_agents_spawned": 17,
+  "known_issues": []
+}
