@@ -1,3 +1,4 @@
+"use server";
 /**
  * Comment actions — re-export module for frontend compatibility.
  */

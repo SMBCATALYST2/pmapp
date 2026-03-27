@@ -3,12 +3,13 @@
 // Full schema with all models, enums, relations, indexes
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 // =====================================================================

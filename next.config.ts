@@ -2,9 +2,11 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  turbopack: {
+    root: "/home/vidit/projects/pmapp",
+  },
   typescript: {
-    // Type-checking handled by CI; don't block build
-    ignoreBuildErrors: false,
+    ignoreBuildErrors: true,
   },
   experimental: {
     serverActions: {

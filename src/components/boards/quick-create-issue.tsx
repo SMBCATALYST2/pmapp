@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
-import { createIssue } from "@/server/actions/issue";
+import { createIssue } from "@/server/actions/issue-actions";
 
 interface QuickCreateIssueProps {
   statusId: string;

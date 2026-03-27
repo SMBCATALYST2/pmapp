@@ -6,7 +6,7 @@ import { z } from "zod";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { updateWorkspace } from "@/server/actions/workspace";
+import { updateWorkspace } from "@/server/actions/workspace-actions";
 import type { Workspace } from "@/types";
 
 const updateWorkspaceSchema = z.object({

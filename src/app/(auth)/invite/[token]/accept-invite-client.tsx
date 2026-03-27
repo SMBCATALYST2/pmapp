@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { acceptInvite } from "@/server/actions/workspace";
+import { acceptInvite } from "@/server/actions/workspace-actions";
 
 interface AcceptInviteClientProps {
   token: string;

@@ -7,7 +7,7 @@ import { z } from "zod";
 import { Loader2, X, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { inviteMember } from "@/server/actions/workspace";
+import { inviteMember } from "@/server/actions/workspace-actions";
 
 const inviteSchema = z.object({
   email: z.string().email("Invalid email address"),

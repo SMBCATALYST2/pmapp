@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Loader2, Check, X } from "lucide-react";
 import { toast } from "sonner";
-import { createProject } from "@/server/actions/project";
+import { createProject } from "@/server/actions/project-actions";
 import { generateProjectKey } from "@/lib/utils";
 import { PROJECT_COLORS } from "@/lib/constants";
 

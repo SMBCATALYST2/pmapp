@@ -23,7 +23,7 @@ import { DragOverlayCard } from "./drag-overlay-card";
 import { BoardFilters } from "./board-filters";
 import { CreateIssueDialog } from "@/components/issues/create-issue-dialog";
 import { EmptyState } from "@/components/shared/empty-state";
-import { moveIssue } from "@/server/actions/issue";
+import { moveIssue } from "@/server/actions/issue-actions";
 import { LayoutGrid, Plus } from "lucide-react";
 
 interface BoardViewProps {

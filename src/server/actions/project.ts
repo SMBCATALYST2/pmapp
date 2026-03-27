@@ -1,3 +1,4 @@
+"use server";
 /**
  * Project actions — re-export module for frontend compatibility.
  */

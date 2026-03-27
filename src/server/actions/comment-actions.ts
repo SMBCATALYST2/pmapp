@@ -26,6 +26,8 @@ import { errors, withErrorHandling } from "@/lib/errors";
 import type { ActionResult } from "@/lib/errors";
 import { extractTextFromTiptap } from "@/lib/utils";
 import type { Comment } from "@prisma/client";
+import { getCommentsByIssue, getActivitiesByIssue } from "@/server/queries/comment-queries";
+import type { CommentWithAuthor, ActivityWithActor } from "@/types";
 
 /**
  * Add a comment to an issue. Extracts bodyText for search.

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import type { IssueWithRelations, MemberWithUser } from "@/types";
-import { updateIssue, deleteIssue } from "@/server/actions/issue";
+import { updateIssue, deleteIssue } from "@/server/actions/issue-actions";
 import { IssueDetailSidebar } from "./issue-detail-sidebar";
 import { IssueTitle } from "./issue-title";
 import { IssueComments } from "./issue-comments";

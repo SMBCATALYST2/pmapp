@@ -7,7 +7,7 @@ import { z } from "zod";
 import { Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { createIssue } from "@/server/actions/issue";
+import { createIssue } from "@/server/actions/issue-actions";
 import { IssueTypeIcon } from "./issue-type-icon";
 import { IssuePriorityIcon } from "./issue-priority-icon";
 import { UserAvatar } from "@/components/shared/user-avatar";

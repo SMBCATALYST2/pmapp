@@ -4,7 +4,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import type { MemberWithUser } from "@/types";
-import { changeMemberRole, removeMember } from "@/server/actions/workspace";
+import { changeMemberRole, removeMember } from "@/server/actions/workspace-actions";
 import { UserAvatar } from "@/components/shared/user-avatar";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { formatRelativeDate } from "@/lib/utils";

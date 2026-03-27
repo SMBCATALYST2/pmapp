@@ -1,3 +1,4 @@
+"use server";
 /**
  * Issue actions — re-export module for frontend compatibility.
  */

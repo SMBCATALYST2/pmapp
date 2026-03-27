@@ -1,10 +1,14 @@
 {
   "compilerOptions": {
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ESNext"
+    ],
     "target": "ESNext",
     "module": "ESNext",
     "moduleDetection": "force",
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "allowJs": true,
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
@@ -24,7 +28,15 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ],
+      "@prisma/client": [
+        "./generated/prisma/client"
+      ],
+      "@prisma/client/*": [
+        "./generated/prisma/*"
+      ]
     },
     "plugins": [
       {
@@ -32,6 +44,14 @@
       }
     ]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

@@ -6,7 +6,7 @@ import { z } from "zod";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { updateProject } from "@/server/actions/project";
+import { updateProject } from "@/server/actions/project-actions";
 import { PROJECT_COLORS } from "@/lib/constants";
 import { useState } from "react";
 import type { Project } from "@/types";

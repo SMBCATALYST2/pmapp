@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import { toast } from "sonner";
-import { updateIssue } from "@/server/actions/issue";
+import { updateIssue } from "@/server/actions/issue-actions";
 
 interface IssueTitleProps {
   issueId: string;

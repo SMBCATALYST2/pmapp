@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
-import { getIssueActivities } from "@/server/queries/activity";
+import { fetchIssueActivities } from "@/server/actions/fetch-actions";
 import { UserAvatar } from "@/components/shared/user-avatar";
 import { formatRelativeDate } from "@/lib/utils";
 import type { ActivityWithActor, ActivityMetadata } from "@/types";
@@ -19,7 +19,7 @@ export function IssueActivity({ issueId, workspaceId }: IssueActivityProps) {
   useEffect(() => {
     async function load() {
       try {
-        const data = await getIssueActivities(issueId, workspaceId);
+        const data = await fetchIssueActivities(issueId, workspaceId);
         setActivities(data);
       } catch {
         // Silently fail

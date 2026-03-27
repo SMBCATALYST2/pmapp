@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Pencil, Trash2, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
-import { createComment, updateComment, deleteComment } from "@/server/actions/comment";
-import { getIssueComments } from "@/server/queries/activity";
+import { createComment, updateComment, deleteComment } from "@/server/actions/comment-actions";
+import { fetchIssueComments } from "@/server/actions/fetch-actions";
 import { UserAvatar } from "@/components/shared/user-avatar";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { formatRelativeDate } from "@/lib/utils";
@@ -30,7 +30,7 @@ export function IssueComments({ issueId, workspaceId, currentUserId }: IssueComm
   useEffect(() => {
     async function loadComments() {
       try {
-        const data = await getIssueComments(issueId, workspaceId);
+        const data = await fetchIssueComments(issueId, workspaceId);
         setComments(data);
       } catch {
         // Silently fail, will show empty state
@@ -55,7 +55,7 @@ export function IssueComments({ issueId, workspaceId, currentUserId }: IssueComm
         setNewComment("");
         router.refresh();
         // Reload comments
-        const data = await getIssueComments(issueId, workspaceId);
+        const data = await fetchIssueComments(issueId, workspaceId);
         setComments(data);
       } else {
         toast.error(result.error);
@@ -77,7 +77,7 @@ export function IssueComments({ issueId, workspaceId, currentUserId }: IssueComm
 
     if (result.success) {
       setEditingId(null);
-      const data = await getIssueComments(issueId, workspaceId);
+      const data = await fetchIssueComments(issueId, workspaceId);
       setComments(data);
     } else {
       toast.error(result.error);
@@ -90,7 +90,7 @@ export function IssueComments({ issueId, workspaceId, currentUserId }: IssueComm
     const result = await deleteComment({ id: deleteId });
     if (result.success) {
       setDeleteId(null);
-      const data = await getIssueComments(issueId, workspaceId);
+      const data = await fetchIssueComments(issueId, workspaceId);
       setComments(data);
     } else {
       toast.error(result.error);

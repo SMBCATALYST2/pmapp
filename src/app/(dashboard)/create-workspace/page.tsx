@@ -8,7 +8,7 @@ import { useState, useEffect } from "react";
 import { Loader2, Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { slugify } from "@/lib/utils";
-import { createWorkspace } from "@/server/actions/workspace";
+import { createWorkspace } from "@/server/actions/workspace-actions";
 
 const createWorkspaceSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").max(50, "Name too long"),
