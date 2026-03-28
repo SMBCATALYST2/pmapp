@@ -17,7 +17,7 @@ const publicRoutes = new Set([
 ]);
 
 // Path prefixes that are always public
-const publicPrefixes = ["/api/auth", "/invite/"];
+const publicPrefixes = ["/api/auth", "/api/health", "/invite/"];
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;

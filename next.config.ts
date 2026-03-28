@@ -2,9 +2,6 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
-  turbopack: {
-    root: "/home/vidit/projects/pmapp",
-  },
   typescript: {
     ignoreBuildErrors: true,
   },

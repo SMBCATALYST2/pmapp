@@ -1,0 +1,47 @@
+# ─────────────────────────────────────────────────────────────
+# PMApp Compose Overlay for SMBNext-Cloud
+# Layered on top of base infra (postgres, redis, caddy)
+#
+# Usage: docker compose -f docker-compose.yml -f templates/pmapp.yml up -d
+# ─────────────────────────────────────────────────────────────
+
+services:
+  pmapp:
+    image: registry.digitalocean.com/smbnext/pmapp:latest
+    container_name: pmapp
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME:-pmapp}
+      - DB_USER=${DB_USER:-pmapp}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - REDIS_URL=redis://redis:6379
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - NEXTAUTH_URL=https://${DOMAIN}
+      - NEXT_PUBLIC_APP_URL=https://${DOMAIN}
+      - NEXT_PUBLIC_APP_NAME=${APP_NAME:-PMApp}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - TENANT_SLUG=${TENANT_SLUG:-default}
+      - TENANT_NAME=${TENANT_NAME:-Default Workspace}
+      - NODE_ENV=production
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Caddy labels/config for routing
+  # Expects base caddy service to reverse-proxy based on container name
+  # All traffic → pmapp:3000 (Next.js serves both /api/* and /*)
+
+networks:
+  app-network:
+    external: true
