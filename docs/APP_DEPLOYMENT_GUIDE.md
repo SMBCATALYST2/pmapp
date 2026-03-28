@@ -79,7 +79,7 @@ The control plane generates a `.env` file per tenant. The entrypoint constructs 
 ### Manual Provisioning
 
 ```bash
-docker exec pmapp bun ./scripts/provision_tenant.ts \
+docker exec pmapp tsx ./scripts/provision_tenant.ts \
   --admin-email admin@company.com \
   --admin-password "SecureP@ss123" \
   --slug my-company \
@@ -146,7 +146,7 @@ INSERT INTO app_manifests (
     'templates/pmapp.yml',
     '/api/health',
     60,
-    'bun ./scripts/provision_tenant.ts --admin-email {{ADMIN_EMAIL}} --admin-password {{ADMIN_PASSWORD}} --slug {{TENANT_SLUG}} --name "{{TENANT_NAME}}"',
+    'tsx ./scripts/provision_tenant.ts --admin-email {{ADMIN_EMAIL}} --admin-password {{ADMIN_PASSWORD}} --slug {{TENANT_SLUG}} --name "{{TENANT_NAME}}"',
     'npx prisma migrate deploy --schema=./prisma/schema.prisma',
     '{
         "DB_HOST": {"required": true, "default": "postgres"},

@@ -38,8 +38,8 @@ ENV HOSTNAME="0.0.0.0"
 # Install OpenSSL for Prisma engine + curl for healthcheck
 RUN apt-get update && apt-get install -y openssl curl && rm -rf /var/lib/apt/lists/*
 
-# Install Bun in runtime for running scripts (provision_tenant, seed)
-RUN npm install -g bun
+# Install tsx for running TypeScript scripts at runtime
+RUN npm install -g tsx
 
 # Copy standalone build output
 COPY --from=builder /app/.next/standalone ./
@@ -51,6 +51,7 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/generated ./generated
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder /app/node_modules/bcryptjs ./node_modules/bcryptjs
 
 # Copy scripts and entrypoint
 COPY scripts/ ./scripts/

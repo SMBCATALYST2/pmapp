@@ -26,7 +26,7 @@ if [ -n "$ADMIN_EMAIL" ] && [ -n "$ADMIN_PASSWORD" ]; then
   TENANT_NAME="${TENANT_NAME:-Default Workspace}"
 
   echo "==> Provisioning tenant: $TENANT_SLUG ($ADMIN_EMAIL)"
-  bun ./scripts/provision_tenant.ts \
+  tsx ./scripts/provision_tenant.ts \
     --admin-email "$ADMIN_EMAIL" \
     --admin-password "$ADMIN_PASSWORD" \
     --slug "$TENANT_SLUG" \
