@@ -26,7 +26,11 @@ export async function middleware(req: NextRequest) {
     publicRoutes.has(pathname) ||
     publicPrefixes.some((prefix) => pathname.startsWith(prefix));
 
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  const token = await getToken({
+    req,
+    secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
+    secureCookie: req.nextUrl.protocol === "https:",
+  });
   const isAuthenticated = !!token;
 
   // If the user is not authenticated and the route is protected, redirect to sign-in
