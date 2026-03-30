@@ -18,8 +18,8 @@ jobs:
           host: 139.59.47.108
           username: root
           key: ${{ secrets.DEMO_SSH_PRIVATE_KEY }}
-          script_stop: true
           script: |
+            set -e
             cd /opt/pmapp
             echo "==> Pulling latest code..."
             git pull origin main
