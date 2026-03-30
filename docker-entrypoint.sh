@@ -18,7 +18,7 @@ if [ -z "$DATABASE_URL" ]; then
 fi
 
 echo "==> Running database migrations..."
-npx prisma migrate deploy --schema=./prisma/schema.prisma
+./node_modules/.bin/prisma migrate deploy --schema=./prisma/schema.prisma
 
 # Provision tenant if ADMIN_EMAIL is provided (first-time setup)
 if [ -n "$ADMIN_EMAIL" ] && [ -n "$ADMIN_PASSWORD" ]; then
