@@ -1,0 +1,40 @@
+name: Deploy to Demo
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: deploy-demo
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to pmapp-demo
+        uses: appleboy/ssh-action@v1
+        with:
+          host: 139.59.47.108
+          username: root
+          key: ${{ secrets.DEMO_SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+            cd /opt/pmapp
+            echo "==> Pulling latest code..."
+            git pull origin main
+
+            echo "==> Building and deploying..."
+            docker compose up -d --build
+
+            echo "==> Waiting for health check..."
+            for i in $(seq 1 30); do
+              if curl -sf http://localhost:3000/api/health > /dev/null 2>&1; then
+                echo "==> Deploy successful! App is healthy."
+                exit 0
+              fi
+              sleep 2
+            done
+            echo "==> Health check failed after 60s"
+            docker compose logs app --tail 20
+            exit 1
