@@ -84,3 +84,18 @@ Next: Phase 7.5 — FIX ROUND then Phase 8
 
 ---
 
+## Phase 7.5: FIX + BUILD — COMPLETE
+Fixed:
+- Prisma 7→5 downgrade (client engine incompatibility with Turbopack)
+- Server action re-exports missing "use server" + client import path fixes
+- Client components importing server queries → created fetch-actions.ts wrapper
+- Prisma client import path (generated/prisma vs generated/prisma/client)
+- next.config.ts cleanup (invalid eslint key, turbopack.root)
+Build: PASSING — 19 routes (4 static, 15 dynamic)
+Pushed to: https://github.com/SMBCATALYST2/pmapp
+
+---
+
+## Phase 9: END — COMPLETE
+Pipeline finished. All code committed and pushed.
+
